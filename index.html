@@ -84,7 +84,33 @@
         function tweetTime(tweetId) {
             return new Date(parseInt(tweetId / 2 ** 22) + 1288834974657);
         }
-    
+
+        function relativeTime(tweetTime) {
+            let diff = Date.now() - tweetTime;
+            if (diff < 0) {
+                return 'from the future!';
+            }
+            const datetimeUnits = ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond'];
+            let datetimeParts = new Date(diff).toISOString().split(/\D/).map(x => parseInt(x));
+            datetimeParts[0] -= 1970;
+            datetimeParts[1] -= 1;
+            datetimeParts[2] -= 1;
+            let primaryUnit, secondaryUnit, primaryQuotient, secondaryQuotient;
+            for (let i = 0; i < datetimeUnits.length - 1; i++) {
+                if (datetimeParts[i] == 0) {
+                    continue;
+                }
+                [primaryUnit, secondaryUnit] = datetimeUnits.slice(i, i + 2);
+                [primaryQuotient, secondaryQuotient] = datetimeParts.slice(i, i + 2);
+                break;
+            }
+            let diffStr = `${primaryQuotient} ${primaryUnit}${primaryQuotient != 1 ? 's' : ''}`;
+            if (secondaryQuotient > 0) {
+                diffStr += ` and ${secondaryQuotient} ${secondaryUnit}${secondaryQuotient != 1 ? 's' : ''}`;
+            }
+            return `${diffStr} ago`;
+        }
+
         function showTweetTime(e) {
             let tid = e.target.value.replace(/^(https?:\/\/)?twitter.com\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             let result = 'Input a valid Tweet ID or URL!'
@@ -93,12 +119,12 @@
                     result = 'Old Tweet ID format (prior to November 2010) is not supported!';
                 } else {
                     let ttime = tweetTime(tid);
-                    result = `Tweet ID: ${tid}\nTweetdAt: ${ttime}\nUTC Time: ${ttime.toUTCString()}`;
+                    result = `  Tweet ID: ${tid}\n   Tweeted: ${relativeTime(ttime)}\nLocal Time: ${ttime}\n  UTC Time: ${ttime.toUTCString()}`;
                 }
             }
             document.querySelector('code').textContent = result;
         }
-    
+
         document.querySelector('input').oninput = showTweetTime;
     </script>
 </body>
