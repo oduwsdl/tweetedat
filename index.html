@@ -89,7 +89,7 @@
         function relativeTime(tweetTime) {
             let diff = Date.now() - tweetTime;
             if (diff < 0) {
-                return 'from the future!';
+                return 'From the future!';
             }
             const datetimeUnits = ['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond'];
             let datetimeParts = new Date(diff).toISOString().split(/\D/).map(x => parseInt(x));
