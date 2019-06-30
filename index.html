@@ -9,6 +9,7 @@
         }
         body {
             margin: 0;
+            padding-bottom: 30px;
         }
         section {
             max-width: 700px;
@@ -119,10 +120,10 @@
                     result = 'Old Tweet ID format (prior to November 2010) is not supported!';
                 } else {
                     let ttime = tweetTime(tid);
-                    result = `  Tweet ID: ${tid}\n   Tweeted: ${relativeTime(ttime)}\nLocal Time: ${ttime}\n  UTC Time: ${ttime.toUTCString()}`;
+                    result = `  <b>Tweet ID:</b> ${tid}\n   <b>Tweeted:</b> ${relativeTime(ttime)}\n<b>Local Time:</b> ${ttime}\n  <b>UTC Time:</b> ${ttime.toUTCString()}`;
                 }
             }
-            document.querySelector('code').textContent = result;
+            document.querySelector('code').innerHTML = result;
         }
 
         document.querySelector('input').oninput = showTweetTime;
