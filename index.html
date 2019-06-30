@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TweetedAt: Find the date and time of a tweet</title>
+    <style>
+        html {
+            background-color: #dfe6e9;
+            font-family: sans-serif;
+        }
+        body {
+            margin: 0;
+        }
+        section {
+            max-width: 700px;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 20px;
+        }
+        #main {
+            background-color: #74b9ff;
+        }
+        #info {
+            background-color: #81ecec;
+            color: #636e72;
+        }
+        #info a {
+            color: #636e72;
+        }
+        del {
+            color: #d63031;
+        }
+        h1 {
+            text-align: center;
+            margin: 10px;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        pre {
+            border: 1px solid #000;
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 10px;
+            border-radius: 10px;
+            overflow: auto;
+            font-size: 16px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            background-color: #2d3436;
+            color: #dfe6e9;
+            text-align: center;
+            font-size: 14px;
+            width: 100%;
+            padding: 5px;
+        }
+        footer a {
+            color: #dfe6e9;
+        }
+    </style>
+</head>
+<body>
+    <section id="main">
+            <h1>TweetedAt</h1>
+            <input type="text" placeholder="Tweet ID or URL">
+            <pre><code>Input a valid Tweet ID or URL!</code></pre>
+    </section>
+    <section id="info">
+        <p>TweetedAt extracts date and time from the tweet ID by reverse-engineering <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">Twitter Snowflake</a>.</p>
+        <p>Why not check on Twitter directly?</p>
+        <ul>
+            <li>The tweet might be <del>deleted</del>!</li>
+            <li>Twitter has API access rate limits!</li>
+        </ul>
+    </section>
+    <footer><a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a> by <a href="https://twitter.com/WebSciDL">Web Science and Digital Libraries Research Group</a>, <a href="https://odu.edu/compsci">Department of Computer Science</a>, <a href="https://odu.edu/">Old Dominion University</a>, Norfolk VA - 23529</footer>
+    <script>
+        function tweetTime(tweetId) {
+            return new Date(parseInt(tweetId / 2 ** 22) + 1288834974657);
+        }
+    
+        function showTweetTime(e) {
+            let tid = e.target.value.replace(/^(https?:\/\/)?twitter.com\/\w+\/status\//i, '').replace(/\D+.*$/, '');
+            let result = 'Input a valid Tweet ID or URL!'
+            if (tid && !isNaN(tid)) {
+                if (tid.length < 19) {
+                    result = 'Old Tweet ID format (prior to November 2010) is not supported!';
+                } else {
+                    let ttime = tweetTime(tid);
+                    result = `Tweet ID: ${tid}\nTweetdAt: ${ttime}\nUTC Time: ${ttime.toUTCString()}`;
+                }
+            }
+            document.querySelector('code').textContent = result;
+        }
+    
+        document.querySelector('input').oninput = showTweetTime;
+    </script>
+</body>
+</html>
