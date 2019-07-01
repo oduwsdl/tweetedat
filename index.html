@@ -12,7 +12,7 @@
             padding-bottom: 30px;
         }
         section {
-            max-width: 700px;
+            max-width: 750px;
             margin: 10px auto;
             padding: 10px;
             border-radius: 20px;
@@ -26,9 +26,6 @@
         }
         #info a {
             color: #636e72;
-        }
-        del {
-            color: #d63031;
         }
         h1 {
             text-align: center;
@@ -51,7 +48,7 @@
             overflow: auto;
             font-size: 16px;
         }
-        code b {
+        code a, code b {
             color: #fff;
         }
         footer {
@@ -73,20 +70,21 @@
     <section id="main">
             <h1>TweetedAt</h1>
             <input type="text" placeholder="Tweet ID or URL">
-            <pre><code>Input a valid Tweet ID or URL!</code></pre>
+            <pre><code>Input a valid Tweet ID or URL</code></pre>
     </section>
     <section id="info">
         <p><a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a> extracts date and time from the tweet ID by reverse-engineering <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">Twitter Snowflake</a>.</p>
         <p>Why not check on Twitter directly?</p>
         <ul>
-            <li>The tweet might be <del>deleted</del>!</li>
-            <li>Twitter has API access rate limits!</li>
+            <li>Metadata for <a href="https://ws-dl.blogspot.com/2018/04/2018-04-23-grampa-whats-deleted-tweet.html">deleted tweets</a> is not accessible from the API</li>
+            <li>Twitter has <a href="https://developer.twitter.com/en/docs/basics/rate-limits">API access rate limits</a></li>
         </ul>
     </section>
     <footer><a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a> by <a href="https://twitter.com/WebSciDL">Web Science and Digital Libraries Research Group</a>, <a href="https://odu.edu/compsci">Department of Computer Science</a>, <a href="https://odu.edu/">Old Dominion University</a>, Norfolk VA - 23529</footer>
     <script>
         function tweetTime(tweetId) {
-            return new Date(parseInt(tweetId / 2 ** 22) + 1288834974657);
+          var now = new Date(parseInt(tweetId / 2 ** 22) + 1288834974657);
+          return new Date(parseInt(tweetId / 2 ** 22) + 1288834974657);
         }
 
         function relativeTime(tweetTime) {
@@ -123,12 +121,12 @@
                     result = 'Old Tweet ID format (prior to November 2010) is not supported!';
                 } else {
                     let ttime = tweetTime(tid);
-                    result = `  <b>Tweet ID:</b> ${tid}\n   <b>Tweeted:</b> ${relativeTime(ttime)}\n<b>Local Time:</b> ${ttime}\n  <b>UTC Time:</b> ${ttime.toUTCString()}`;
+                    console.log(ttime);
+                    result = `<b>Tweet ID:</b>         ${tid}\n<b>Tweeted:</b>          ${relativeTime(ttime)}\n<b><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8061</a>:</b>         ${ttime.toISOString()}\n<b><a href="https://tools.ietf.org/html/rfc1123">RFC 1123</a>:</b>         ${ttime.toUTCString()}\n<b>In your timezone:</b> ${ttime}`;
                 }
             }
             document.querySelector('code').innerHTML = result;
         }
-
         document.querySelector('input').oninput = showTweetTime;
     </script>
 </body>
