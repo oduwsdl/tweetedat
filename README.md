@@ -4,5 +4,5 @@
 
 Why not check on Twitter directly?
 
-* The tweet might be deleted!
-* Twitter has API access rate limits!
+* Metadata for [deleted tweets](https://ws-dl.blogspot.com/2018/04/2018-04-23-grampa-whats-deleted-tweet.html) is not accessible from the API
+* Twitter has [API access rate limits](https://developer.twitter.com/en/docs/basics/rate-limits)
