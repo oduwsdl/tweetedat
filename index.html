@@ -46,7 +46,7 @@
             padding: 10px;
             border-radius: 10px;
             overflow: auto;
-            font-size: 16px;
+            font-size: 15px;
         }
         code a, code b {
             color: #fff;
@@ -122,8 +122,7 @@
                     result = 'Old Tweet ID format (prior to November 2010) is not supported!';
                 } else {
                     let ttime = tweetTime(tid);
-                    console.log(ttime);
-                    result = `<b>Tweet ID:</b>         ${tid}\n<b>Tweeted:</b>          ${relativeTime(ttime)}\n<b><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8061</a>:</b>         ${ttime.toISOString()}\n<b><a href="https://tools.ietf.org/html/rfc1123">RFC 1123</a>:</b>         ${ttime.toUTCString()}\n<b>In your timezone:</b> ${ttime}`;
+                    result = `<b>Tweet ID:</b>         ${tid}\n<b>Tweeted:</b>          ${relativeTime(ttime)}\n<b><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8061</a>:</b>         ${ttime.toISOString()}\n<b><a href="https://tools.ietf.org/html/rfc1123">RFC 1123</a>:</b>         ${ttime.toUTCString()}\n<b>In your timezone:</b> ${ttime.toString().replace(/(\S{3}) (\S{3}) (\d{2}) (.*)/, "$1, $3 $2 $4")}`;
                 }
             }
             document.querySelector('code').innerHTML = result;
