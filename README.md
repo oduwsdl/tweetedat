@@ -4,5 +4,5 @@
 
 Why not check on Twitter directly?
 
-* Metadata for [deleted tweets](https://ws-dl.blogspot.com/2018/04/2018-04-23-grampa-whats-deleted-tweet.html) is not accessible from the API
+* [Deleted tweets](https://help.twitter.com/en/using-twitter/delete-tweets) do not have their metadata accessible from the API
 * Twitter has [API access rate limits](https://developer.twitter.com/en/docs/basics/rate-limits)
