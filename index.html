@@ -116,8 +116,10 @@
         function showTweetTime(e) {
             let tid = e.target.value.replace(/^(https?:\/\/)?twitter.com\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             let result = 'Input a valid Tweet ID or URL!'
-            if (tid && !isNaN(tid)) {
-                if (tid.length < 19) {
+            if (tid && !isNaN(tid) && !(tid.length > 20)) {
+                // 356009025474562 is a tweet ID from http://web.archive.org/web/20101107012803/twitter.com/cnn around Snowflake deployment
+                // TODO: We need to identify a more exact number when transition to Snowflake happened
+                if (parseInt(tid) < 356009025474562) {
                     result = 'Old Tweet ID format (prior to November 2010) is not supported!';
                 } else {
                     let ttime = tweetTime(tid);
