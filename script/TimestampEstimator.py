@@ -7,6 +7,7 @@ import random
 import csv
 import argparse
 import os
+import time
 
 
 '''
@@ -82,10 +83,14 @@ Get timestamp of any Tweet in millisconds using Twitter API
 
 
 def get_tweet_timestamp(tweet_id, twitter_object):
-    twitter_response = twitter_object.GetStatus(tweet_id)
-    tweet_date_time = datetime.strptime(twitter_response.created_at, "%a %b %d %H:%M:%S %z %Y")
-    return int(tweet_date_time.timestamp())
-
+    try:
+        twitter_response = twitter_object.GetStatus(tweet_id)
+        tweet_date_time = datetime.strptime(twitter_response.created_at, "%a %b %d %H:%M:%S %z %Y")
+        return int(tweet_date_time.timestamp())
+    except Exception as e:
+        print(e)
+        time.sleep(300)
+        get_tweet_timestamp(tweet_id, twitter_object)
 
 '''
 Get the current valid tweet id around the specified tweet id
@@ -187,12 +192,12 @@ def find_tweet_timestamp_pre_snowflake(tid):
         if tid < int(prev_line_parts[0]):
             return -1
         elif tid == int(prev_line_parts[0]):
-            return int(prev_line_parts[1])
+            return int(prev_line_parts[1]) * 1000
         else:
             for line in file_tweet_timeline:
                 line_parts = line.rstrip().split(",")
                 if tid == int(line_parts[0]):
-                    return [int(line_parts[1])]
+                    return int(prev_line_parts[1]) * 1000
                 if int(prev_line_parts[0]) < tid < int(line_parts[0]):
                     estimated_timestamp = round(int(prev_line_parts[1]) + (((tid - int(prev_line_parts[0])) / (int(line_parts[0]) - int(prev_line_parts[0]))) * (int(line_parts[1]) - int(prev_line_parts[1]))))
                     return estimated_timestamp * 1000
@@ -252,7 +257,8 @@ def find_tweet_ids(start_tweet_id, end_tweet_id, data_points, list_current_test_
     sample_twitter_url = "https://twitter.com/jack/status/"
     points = 0
     twitter_object = create_twitter_instance()
-    while points < data_points:
+    count = 0
+    while points < data_points and count < (data_points * 5):
         tweet_status = False
         current_tweet_id = random.randint(start_tweet_id, end_tweet_id)
         response = requests.head(sample_twitter_url + str(current_tweet_id))
@@ -268,6 +274,8 @@ def find_tweet_ids(start_tweet_id, end_tweet_id, data_points, list_current_test_
             random_tweet_timestamp = get_tweet_timestamp(current_tweet_id, twitter_object)
             file_test_set.write(str(current_tweet_id) + "," + str(random_tweet_timestamp) + "\n")
             points += 1
+        count += 1
+    return
 
 
 '''
@@ -285,14 +293,14 @@ def find_estimate_error():
     fieldnames = ["TweetId", "TweetTimestamp", "EstimatedTimestamp", "Error"]
     writer = csv.DictWriter(file_test_error, fieldnames=fieldnames)
     writer.writeheader()
-    with open("test_set.txt", "r") as file_test_test:
+    with open(os.path.join(data_directory, "testset.txt"), "r") as file_test_test:
         for line in file_test_test:
             data_points += 1
             line_parts = line.rstrip().split(",")
             estimated_timestamp = find_tweet_timestamp(int(line_parts[0]))
-            error = abs(estimated_timestamp - int(line_parts[1]))
+            error = abs(int(estimated_timestamp / 1000) - int(line_parts[1]))
             cumulative_error += error
-            writer.writerow({"TweetId": line_parts[0], "TweetTimestamp": line_parts[1], "EstimatedTimestamp": estimated_timestamp, "Error": error})
+            writer.writerow({"TweetId": line_parts[0], "TweetTimestamp": line_parts[1], "EstimatedTimestamp": int(estimated_timestamp / 1000), "Error": error})
     file_test_error.close()
     error_rate = int(cumulative_error / data_points)
     hour_error = int(error_rate / (60*60))
