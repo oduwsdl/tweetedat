@@ -33,6 +33,53 @@ The script can be used for:
 
 ### Using CLI Version of Python Script
 
+* Option -h: for help 
+```bash
+$ ./TimestampEstimator.py -h
+usage: TimestampEstimator.py [-h] [-s [TESTSET [TESTSET ...]] | -d [DATASET] |
+                             -e | -t TIMESTAMP]
 
+Create a pre-Snowflake Tweet Id dataset based on threshold value, Find
+timestamp of any pre or post Snowflake Tweet id ,Create Pre-Snowflake Twitter
+test dataset and check errors on them
 
+optional arguments:
+  -h, --help            show this help message and exit
+  -s [TESTSET [TESTSET ...]]
+                        Create test set with argument of start, end Tweet Id,
+                        and no. of data points
+  -d [DATASET]          Create a dataset with argument of threshold value in
+                        seconds
+  -e                    Check error on pre-Snowflake ids
+  -t TIMESTAMP          Find timestamp of any tweet id
 
+```
+* Option -t: for finding timestamp of a Tweet ID
+
+```bash
+$ ./TimestampEstimator.py -t 20
+```
+* Option -d: for creating pre-Snowflake data set for estimating timestamp. It accepts the threshold value in seconds. When no parameter is supplied, it creates a weekly data set.
+
+For creating daily data set
+
+```bash
+$ ./TimestampEstimator.py -d 24*60*60
+```
+* Option -s: For creating test set. It accept start tweet ID, end tweet ID,number of test data points, and data point interval as parameters.
+
+For creating a weekly data set of 10 tweet IDs between tweet ID 20 and 1000
+
+```bash
+$ ./TimestampEstimator.py -s 20 1000 10 7
+```
+
+For creating random data set of 100 points between tweet ID 20 and 1000
+
+```bash
+$ ./TimestampEstimator.py -s 20 1000 10 7
+```
+* Option e: Calculates error csv file of the test set
+```bash
+$ ./TimestampEstimator.py -e
+```
