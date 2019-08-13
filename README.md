@@ -79,7 +79,7 @@ For creating random data set of 100 points between tweet ID 20 and 1000
 ```bash
 $ ./TimestampEstimator.py -s 20 1000 10 7
 ```
-* Option e: Calculates error csv file of the test set
+* Option -e: Calculates error csv file of the test set
 ```bash
 $ ./TimestampEstimator.py -e
 ```
