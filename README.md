@@ -2,7 +2,7 @@
 
 [TweetedAt](https://oduwsdl.github.io/tweetedat/) extracts date and time from the tweet ID by reverse-engineering [Twitter Snowflake](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html).
 
-[1] Mohammed Nauman Siddique and Sawood Alam. 2019. TweetedAt: Finding Tweet Timestamps for Pre and Post Snowflake Tweet IDs. (Auguest 2019). Retrieved July 25, 2020 from https://ws-dl.blogspot.com/2019/08/2019-08-03-tweetedat-finding-tweet.html
+[1] Mohammed Nauman Siddique and Sawood Alam. 2019. TweetedAt: Finding Tweet Timestamps for Pre and Post Snowflake Tweet IDs. (August 2019). Retrieved July 25, 2020 from https://ws-dl.blogspot.com/2019/08/2019-08-03-tweetedat-finding-tweet.html
 
 ## Why not check on Twitter directly?
 
