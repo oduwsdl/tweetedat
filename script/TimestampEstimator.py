@@ -11,7 +11,7 @@ import twitter
 
 
 '''
-Generate data points for estimation of Tweet Id sand their timestamps before Snowflake
+Generate data points for estimation of Tweet IDs and their timestamps before Snowflake
 '''
 
 
@@ -19,7 +19,7 @@ def break_tweet_timeline(tolerance):
     '''
     Last timestamp found from Memento Link:
     https://web.archive.org/web/20190618182911/https://twitter.com/nytimes/status/29548970348
-    We used curl bach command to find the last tweet id
+    We used curl bach command to find the last Tweet ID
     '''
     end_tweet_id = 29700859247
     start_tweet_id = 20
@@ -59,7 +59,7 @@ def write_data_points(list_tweets):
 
 
 '''
-Use divide and conquer technique to find the data points between start and end tweet ids
+Use divide and conquer technique to find the data points between start and end Tweet IDs
 '''
 
 
@@ -93,7 +93,7 @@ def get_tweet_timestamp(tweet_id, twitter_object):
         get_tweet_timestamp(tweet_id, twitter_object)
 
 '''
-Get the current valid tweet id around the specified tweet id
+Get the current valid Tweet ID around the specified Tweet ID
 '''
 
 
@@ -220,7 +220,7 @@ def find_tweet_timestamp(tid):
 
 
 '''
-Generate test points of Tweet Ids
+Generate test points of Tweet IDs
 '''
 
 
@@ -325,12 +325,12 @@ def threshold_value(tolerance):
 
 
 if __name__== "__main__":
-    parser = argparse.ArgumentParser(description='Create a pre-Snowflake Tweet Id dataset based on threshold value, Find timestamp of any pre or post Snowflake Tweet id ,Create Pre-Snowflake Twitter test dataset and check errors on them')
+    parser = argparse.ArgumentParser(description='Create a pre-Snowflake Tweet ID dataset based on threshold value, Find timestamp of any pre or post Snowflake Tweet ID, Create Pre-Snowflake Twitter test dataset and check errors on them')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-s', dest='testset', nargs='*', type=int, default=None, help="Create test set with argument of start, end Tweet Id, and no. of data points")
+    group.add_argument('-s', dest='testset', nargs='*', type=int, default=None, help="Create test set with argument of start, end Tweet ID, and no. of data points")
     group.add_argument('-d', dest='dataset', nargs='?', const="7*24*60*60", type=threshold_value, help="Create a dataset with argument of theshold value in seconds")
     group.add_argument('-e', dest='errortest', action='store_true', help="Check error on pre-Snowflake ids")
-    group.add_argument('-t', dest='timestamp', type=int, help="Find timestamp of any tweet id")
+    group.add_argument('-t', dest='timestamp', type=int, help="Find timestamp of any Tweet ID")
     args = parser.parse_args()
     if args.testset:
         start_tweet_id, end_tweet_id, data_points, data_interval = fix_test_set_arguments(args.testset)
