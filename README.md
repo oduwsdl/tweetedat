@@ -37,23 +37,18 @@ The script can be used for:
 
 * Option -h: for help 
 ```bash
-$ ./TimestampEstimator.py -h
-usage: TimestampEstimator.py [-h] [-s [TESTSET [TESTSET ...]] | -d [DATASET] |
-                             -e | -t TIMESTAMP]
+$  ./TimestampEstimator.py -h
+usage: TimestampEstimator.py [-h] [-s [TESTSET ...] | -d [DATASET] | -e | -t TIMESTAMP]
 
-Create a pre-Snowflake Tweet Id dataset based on threshold value, Find
-timestamp of any pre or post Snowflake Tweet id ,Create Pre-Snowflake Twitter
-test dataset and check errors on them
+Create a pre-Snowflake Tweet ID dataset based on threshold value, Find timestamp of any pre or post Snowflake Tweet ID, Create Pre-
+Snowflake Twitter test dataset and check errors on them
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -s [TESTSET [TESTSET ...]]
-                        Create test set with argument of start, end Tweet Id,
-                        and no. of data points
-  -d [DATASET]          Create a dataset with argument of threshold value in
-                        seconds
-  -e                    Check error on pre-Snowflake ids
-  -t TIMESTAMP          Find timestamp of any tweet id
+options:
+  -h, --help        show this help message and exit
+  -s [TESTSET ...]  Create test set with argument of start, end Tweet ID, and no. of data points
+  -d [DATASET]      Create a dataset with argument of theshold value in seconds
+  -e                Check error on pre-Snowflake ids
+  -t TIMESTAMP      Find timestamp of any Tweet ID
 
 ```
 * Option -t: for finding timestamp of a Tweet ID
