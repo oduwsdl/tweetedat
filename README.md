@@ -16,10 +16,10 @@
  ├── script                     
  │  ├── TimestampEstimator.py   # Script file 
  ├── data                           
- │  ├── TweetTimeline.txt       # Contains list of tweet IDs and timestamps for pre-Snowflake IDs used in timestamp estimation
+ │  ├── TweetTimeline.txt       # Contains list of Tweet IDs and timestamps for pre-Snowflake IDs used in timestamp estimation
  │  ├── TweetTimelineList.txt   # Contains the TweetTimeline.txt data as list of lists 
  │  ├── testerror.csv           # Shows the result of error on test set
- │  ├── testset.txt             # Contains test set of tweet IDs and their timestamps 
+ │  ├── testset.txt             # Contains test set of Tweet IDs and their timestamps 
  │  └── WeirdUrls.txt           # Lists all pre-Snowflake Twitter URLs which didn't resolve to 200 after chasing the redirect location 
  ├── index.html                 # TweetedAt implementation
  ├── LICENSE
