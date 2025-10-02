@@ -341,8 +341,11 @@ if __name__== "__main__":
         find_estimate_error()
     elif args.timestamp:
         tstamp = find_tweet_timestamp(args.timestamp)
-        utcdttime = datetime.utcfromtimestamp(tstamp / 1000)
-        print(str(args.timestamp) + "   :  " + str(tstamp) + " => " + str(utcdttime))
+        if tstamp == -1:
+            print(f"{args.timestamp}   :  Not found")
+        else:
+            utcdttime = datetime.fromtimestamp(tstamp / 1000, tz=datetime.timezone.utc)
+            print(str(args.timestamp) + "   :  " + str(tstamp) + " => " + str(utcdttime))
     elif not args.testset:
         args.testset = [20, 29700859247, 1000, 0]
         start_tweet_id, end_tweet_id, data_points, data_interval = fix_test_set_arguments(args.testset)
