@@ -1,13 +1,13 @@
 #!/usr/bin/env	python3
 
-import requests
-from datetime import datetime
-import twitter
-import random
-import csv
 import argparse
+import csv
+from datetime import datetime
 import os
+import random
+import requests
 import time
+import twitter
 
 
 '''
