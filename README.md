@@ -1,14 +1,14 @@
 # TweetedAt
 
-[TweetedAt](https://oduwsdl.github.io/tweetedat/) extracts date and time from the tweet ID by reverse-engineering [Twitter Snowflake](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html).
+[TweetedAt](https://oduwsdl.github.io/tweetedat/) extracts date and time from the Tweet ID by reverse-engineering [Twitter Snowflake](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html).
 
 [1] Mohammed Nauman Siddique and Sawood Alam. 2019. TweetedAt: Finding Tweet Timestamps for Pre and Post Snowflake Tweet IDs. (August 2019). Retrieved July 25, 2020 from https://ws-dl.blogspot.com/2019/08/2019-08-03-tweetedat-finding-tweet.html
 
 ## Why not check on Twitter directly?
 
-* It is the only web service which allows users to find the timestamp of the Snowflake tweet IDs and estimate tweet timestamps for pre-Snowflake Tweet IDs.
-* Twitter developer API has [access rate limits](https://developer.twitter.com/en/docs/basics/rate-limits). It acts as a bottleneck in finding timestamps over a data set of tweet IDs. This bottleneck is not present in TweetedAt because we do not interact with Twitter's developer API for finding timestamps. 
-* [Deleted]((https://help.twitter.com/en/using-twitter/delete-tweets)), [suspended](https://help.twitter.com/en/managing-your-account/suspended-twitter-accounts), and [protected](https://help.twitter.com/en/safety-and-security/public-and-protected-tweets) tweets do not have their metadata accessible from Twitter's developer API. TweetedAt is the solution for finding the timestamps of any of these inaccessible tweets. 
+* It is the only web service that allows users to find the timestamp of the Snowflake Tweet IDs and estimate Tweet timestamps for pre-Snowflake Tweet IDs.
+* Twitter developer API has [access rate limits](https://developer.twitter.com/en/docs/basics/rate-limits). It acts as a bottleneck in finding timestamps over a data set of Tweet IDs. This bottleneck is not present in TweetedAt because we do not interact with Twitter's developer API for finding timestamps. 
+* [Deleted]((https://help.twitter.com/en/using-twitter/delete-tweets)), [suspended](https://help.twitter.com/en/managing-your-account/suspended-twitter-accounts), and [protected](https://help.twitter.com/en/safety-and-security/public-and-protected-tweets) Tweets do not have their metadata accessible from Twitter's developer API. TweetedAt is the solution for finding the timestamps of any of these inaccessible Tweets. 
 
 ## Repo Content Description
 ```bash
