@@ -307,7 +307,7 @@ def find_estimate_error():
     error_rate = error_rate % (60*60)
     minute_error = int(error_rate / 60)
     error_rate = error_rate % 60
-    print("Error rate: " + str(hour_error) + ":" + str(minute_error) + ":" + str(error_rate))
+    print(f"Error rate: {hour_error}:{minute_error}:{error_rate}")
 
 def fix_test_set_arguments(argument):
     start_tweet_id = argument[0]
@@ -342,10 +342,10 @@ if __name__== "__main__":
     elif args.timestamp:
         tstamp = find_tweet_timestamp(args.timestamp)
         if tstamp == -1:
-            print(f"{args.timestamp}   :  Not found")
+            print(f"{args.timestamp}: Not found")
         else:
             utcdttime = datetime.fromtimestamp(tstamp / 1000, tz=datetime.timezone.utc)
-            print(str(args.timestamp) + "   :  " + str(tstamp) + " => " + str(utcdttime))
+            print(f"{args.timestamp}   :  {tstamp} => {utcdttime}")
     elif not args.testset:
         args.testset = [20, 29700859247, 1000, 0]
         start_tweet_id, end_tweet_id, data_points, data_interval = fix_test_set_arguments(args.testset)
