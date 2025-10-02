@@ -2,7 +2,7 @@
 
 import argparse
 import csv
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import random
 import requests
