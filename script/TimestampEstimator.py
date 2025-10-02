@@ -78,7 +78,7 @@ def generate_tweet_timestamp_id(start, end, twitter_object, list_tweets, toleran
 
 
 '''
-Get timestamp of any Tweet in millisconds using Twitter API
+Get timestamp of any Tweet in milliseconds using Twitter API
 '''
 
 
