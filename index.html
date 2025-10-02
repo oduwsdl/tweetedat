@@ -2494,7 +2494,7 @@
         function showTweetTime() {
             // let tid = document.querySelector('input').value.replace(/^(https?:\/\/)?twitter.com\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             // This will extract the Tweet ID whether the input is from x.com or twitter.com
-            let tid = document.querySelector('input').value.replace(/^(https?:\/\/)?(x\.com|twitter\.com)\/\w+\/status\//i, ''.replace(/\D+.*$/, '');
+            let tid = document.querySelector('input').value.replace(/^(https?:\/\/)?(x\.com|twitter\.com)\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             let result = 'Input a valid Tweet ID or URL';
             if (tid && !isNaN(tid) && !(tid.length > 20)) {
                 let errorNote = '';
