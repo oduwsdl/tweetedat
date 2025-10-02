@@ -29,9 +29,9 @@
 
 The script can be used for:
 
-* finding the timestamp of any Snowflake ID or estimating timestamp of any pre-Snowflake ID
-* creating a test set of pre-Snowflake IDs
-* calcualting error of the test set
+* Finding the timestamp of any Snowflake ID or estimating timestamp of any pre-Snowflake ID
+* Creating a test set of pre-Snowflake IDs
+* Calcualting error of the test set
 
 ### Using CLI Version of Python Script
 
