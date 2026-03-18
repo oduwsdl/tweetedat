@@ -70,8 +70,8 @@
 <body>
     <section id="main">
             <h1>TweetedAt</h1>
-            <input type="text" placeholder="Tweet ID or URL">
-            <pre><code>Input a valid Tweet ID or URL</code></pre>
+            <input id="input1" type="text" placeholder="Tweet ID or URL">
+            <pre><code id="result1"></code></pre>
     </section>
     <section id="info">
         <p><a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a> extracts date and time from the tweet ID by reverse-engineering <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">Twitter Snowflake</a>.</p>
@@ -80,6 +80,14 @@
             <li><a href="https://help.twitter.com/en/using-twitter/delete-tweets">Deleted tweets</a> do not have their metadata accessible from the API</li>
             <li>Twitter has <a href="https://developer.twitter.com/en/docs/basics/rate-limits">API access rate limits</a></li>
         </ul>
+    </section>
+        <section id="main">
+            <h1>Reverse TweetedAt</h1>
+            <input id="input2" type="text" placeholder="Timestamp">
+            <pre><code id="result2"></code></pre>
+    </section>
+        <section id="info">
+        <p><a href="https://github.com/oduwsdl/tweetedat">Reverse TweetedAt</a> converts timestamp to a tweet ID prefix by reversing <a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a>.</p>
     </section>
     <footer><a href="https://github.com/oduwsdl/tweetedat">TweetedAt</a> by <a href="https://twitter.com/WebSciDL">Web Science and Digital Libraries Research Group</a>, <a href="https://odu.edu/compsci">Department of Computer Science</a>, <a href="https://odu.edu/">Old Dominion University</a>, Norfolk VA - 23529</footer>
     <script>
@@ -2491,10 +2499,22 @@
             return `${diffStr} ago`;
         }
 
+        function waybackTime(date) {
+            const Y  = date.getUTCFullYear();
+            const M  = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const D  = String(date.getUTCDate()).padStart(2, '0');
+            const h  = String(date.getUTCHours()).padStart(2, '0');
+            const m  = String(date.getUTCMinutes()).padStart(2, '0');
+            const s  = String(date.getUTCSeconds()).padStart(2, '0');
+
+            return `${Y}${M}${D}${h}${m}${s}`;
+        }
+        
+        let isPopulatingFromHash = false;
+
         function showTweetTime() {
-            // let tid = document.querySelector('input').value.replace(/^(https?:\/\/)?twitter.com\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             // This will extract the Tweet ID whether the input is from x.com or twitter.com
-            let tid = document.querySelector('input').value.replace(/^(https?:\/\/)?(x\.com|twitter\.com)\/\w+\/status\//i, '').replace(/\D+.*$/, '');
+            let tid = document.querySelector('#input1').value.replace(/^(https?:\/\/)?(x\.com|twitter\.com)\/\w+\/status\//i, '').replace(/\D+.*$/, '');
             let result = 'Input a valid Tweet ID or URL';
             if (tid && !isNaN(tid) && !(tid.length > 20)) {
                 let errorNote = '';
@@ -2510,27 +2530,437 @@
                     ttime = snowflakeToTime(tid);
                 }
                 if (ttime) {
-                    result = [`${errorNote}<b>Tweet ID:</b>         ${tid}`,
-                              `<b>Tweeted:</b>          ${relativeTime(ttime)}`,
+                    result = [`${errorNote}<b>User Input:</b>       ${tid}`,
                               `<b><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a>:</b>         ${ttime.toISOString()}`,
-                              `<b><a href="https://tools.ietf.org/html/rfc1123">RFC 1123</a>:</b>         ${ttime.toUTCString()}`,
-                              `<b>In your timezone:</b> ${ttime.toString().replace(/(\S{3}) (\S{3}) (\d{2}) (.*)/, "$1, $3 $2 $4")}`].join(`\n`);
+                              `<b><a href="https://tools.ietf.org/html/rfc1123">RFC 1123</a>:</b>         ${ttime.toUTCString()}`,  
+                              `<b>In your timezone:</b> ${ttime.toString().replace(/(\S{3}) (\S{3}) (\d{2}) (.*)/, "$1, $3 $2 $4")}`,
+                              `<b>IA Wayback (UTC):</b> ${waybackTime(ttime)}`,
+                              `<b>Tweeted:</b>          ${relativeTime(ttime)}`,].join(`\n`);
                 }
-                location.hash = `#${tid}`;
+                if (!isPopulatingFromHash && tid) {
+                    location.hash = `#${tid}`;
+                }
             } else {
+                if (!isPopulatingFromHash) {
                 history.pushState('', document.title, window.location.pathname);
-            }
-            document.querySelector('code').innerHTML = result;
+            }   
         }
-        document.querySelector('input').oninput = showTweetTime;
+            document.querySelector('#result1').innerHTML = result;
+        }
 
-        function populateInput() {
-            const input = document.querySelector('input');
-            input.value = location.hash.replace('#', '');
-            input.oninput();
-        };
-        window.onload = populateInput;
-        window.onhashchange = populateInput;
+function computeIdPrefixExponentRange(minId, maxId) {
+  // Convert to decimal strings and pad to equal length
+  let minStr = minId.toString();
+  let maxStr = maxId.toString();
+  const len = Math.max(minStr.length, maxStr.length);
+
+  minStr = minStr.padStart(len, '0');
+  maxStr = maxStr.padStart(len, '0');
+
+  // Find longest common decimal prefix
+  let i = 0;
+  while (i < len && minStr[i] === maxStr[i]) {
+    i++;
+  }
+
+  const prefixStr = minStr.slice(0, i);      // fixed prefix digits
+  const suffixLen = len - i;                 // number of varying digits
+
+  // If there's no common prefix, treat prefix as 0
+  const prefixVal = BigInt(prefixStr || '0');
+
+  // 10^suffixLen as BigInt
+  let factor = 1n;
+  for (let j = 0; j < suffixLen; j++) {
+    factor *= 10n;
+  }
+
+  const approxLower = prefixVal * factor;
+  const approxUpper = (prefixVal + 1n) * factor - 1n;
+
+  return {
+    prefixStr,      // decimal prefix as string
+    prefixVal,      // prefix as BigInt
+    suffixLen,      // exponent on 10
+    totalDigits: len,
+    approxLower,    // prefix * 10^suffixLen
+    approxUpper     // (prefix+1)*10^suffixLen - 1
+  };
+}
+
+
+function get_tweet_id_from_timestamp() {
+  const input = document.querySelector('#input2').value.trim();
+  const resultBox = document.querySelector('#result2');
+
+  // Config: if an input lacks an explicit timezone, assume UTC (true) or local time (false)
+  const ASSUME_UTC = true;
+
+  const TWITTER_EPOCH_MS = 1288834974657n; // 2010-11-04T01:42:54.657Z
+  const LOWER_22_MASK = (1n << 22n) - 1n;
+
+function parseToDateAndGranularity(str) {
+  if (!str) return null;
+  const s = str.trim();
+
+  // ---------- ISO 8601 (UTC "Z") ----------
+  // ms: 2022-02-20T02:41:02.385Z
+  let m;
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z$/))) {
+    const [_, Y, Mo, D, h, mi, se, ms] = m;
+    const t = Date.UTC(+Y, +Mo-1, +D, +h, +mi, +se, +ms);
+    return { date: new Date(t), gran: 'ms' };
+  }
+  // s: 2022-02-20T02:41:02Z
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/))) {
+    const [_, Y, Mo, D, h, mi, se] = m;
+    const t = Date.UTC(+Y, +Mo-1, +D, +h, +mi, +se, 0);
+    return { date: new Date(t), gran: 's' };
+  }
+  // min: 2022-02-20T02:41Z
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})Z$/))) {
+    const [_, Y, Mo, D, h, mi] = m;
+    const t = Date.UTC(+Y, +Mo-1, +D, +h, +mi, 0, 0);
+    return { date: new Date(t), gran: 'min' };
+  }
+  // hour: 2022-02-20T02Z
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2})Z$/))) {
+    const [_, Y, Mo, D, h] = m;
+    const t = Date.UTC(+Y, +Mo-1, +D, +h, 0, 0, 0);
+    return { date: new Date(t), gran: 'h' };
+  }
+  // date: 2022-02-20Z
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})Z$/))) {
+    const [_, Y, Mo, D] = m;
+    const t = Date.UTC(+Y, +Mo-1, +D, 0, 0, 0, 0);
+    return { date: new Date(t), gran: 'date' };
+  }
+
+  // ---------- RFC 1123 (UTC "GMT") ----------
+  // s: Sun, 20 Feb 2022 02:41:02 GMT
+  if ((m = s.match(/^[A-Za-z]{3},\s(\d{2})\s([A-Za-z]{3})\s(\d{4})\s(\d{2}):(\d{2}):(\d{2})\sGMT$/))) {
+    const day = +m[1], monStr = m[2], year = +m[3], hh = +m[4], mm = +m[5], ss = +m[6];
+    const mons = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    if (!(monStr in mons)) return null;
+    const t = Date.UTC(year, mons[monStr], day, hh, mm, ss, 0);
+    return { date: new Date(t), gran: 's' };
+  }
+  // min: Sun, 20 Feb 2022 02:41 GMT
+  if ((m = s.match(/^[A-Za-z]{3},\s(\d{2})\s([A-Za-z]{3})\s(\d{4})\s(\d{2}):(\d{2})\sGMT$/))) {
+    const day = +m[1], monStr = m[2], year = +m[3], hh = +m[4], mm = +m[5];
+    const mons = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    if (!(monStr in mons)) return null;
+    const t = Date.UTC(year, mons[monStr], day, hh, mm, 0, 0);
+    return { date: new Date(t), gran: 'min' };
+  }
+
+  // ---------- IA Wayback numeric (UTC) ----------
+  // s: 20220220024102 (sec), 202202200241 (min), 2022022002 (hour), 20220220 (date)
+  if (/^\d{14}$/.test(s)) {
+    const Y=+s.slice(0,4), Mo=+s.slice(4,6), D=+s.slice(6,8), h=+s.slice(8,10), mi=+s.slice(10,12), se=+s.slice(12,14);
+    return { date: new Date(Date.UTC(Y,Mo-1,D,h,mi,se,0)), gran: 's' };
+  }
+  if (/^\d{12}$/.test(s)) {
+    const Y=+s.slice(0,4), Mo=+s.slice(4,6), D=+s.slice(6,8), h=+s.slice(8,10), mi=+s.slice(10,12);
+    return { date: new Date(Date.UTC(Y,Mo-1,D,h,mi,0,0)), gran: 'min' };
+  }
+  if (/^\d{10}$/.test(s)) {
+    const Y=+s.slice(0,4), Mo=+s.slice(4,6), D=+s.slice(6,8), h=+s.slice(8,10);
+    return { date: new Date(Date.UTC(Y,Mo-1,D,h,0,0,0)), gran: 'h' };
+  }
+  if (/^\d{8}$/.test(s)) {
+    const Y=+s.slice(0,4), Mo=+s.slice(4,6), D=+s.slice(6,8);
+    return { date: new Date(Date.UTC(Y,Mo-1,D,0,0,0,0)), gran: 'date' };
+  }
+
+  // Anything else: reject (including "Sun, 20 Feb 2022 02 GMT" and padded zero-unknown forms)
+  return null;
+}
+
+// helper: align labels (kept from your original)
+  function padLabel(label, width) {
+    if (label.length >= width) return label;
+    return label + ' '.repeat(width - label.length);
+  }
+
+  // helper: "x days and y hours ago"
+  function formatRelative(date) {
+    const now = new Date();
+    let diffMs = now.getTime() - date.getTime(); // positive if past
+    const past = diffMs >= 0;
+    diffMs = Math.abs(diffMs);
+
+    const diffSec = Math.floor(diffMs / 1000);
+    const days = Math.floor(diffSec / 86400);
+    const hours = Math.floor((diffSec % 86400) / 3600);
+
+    const dayStr = days + ' day' + (days === 1 ? '' : 's');
+    const hourStr = hours + ' hour' + (hours === 1 ? '' : 's');
+
+    if (days === 0 && hours === 0) {
+      return past ? 'just now' : 'right now';
+    }
+
+    return past
+      ? `${dayStr} and ${hourStr} ago`
+      : `in ${dayStr} and ${hourStr}`;
+  }
+
+  function formatRelativeYearsMonths(date) {
+  const now = new Date();
+  const past = date <= now;
+
+  let y1 = past ? date.getFullYear()  : now.getFullYear();
+  let m1 = past ? date.getMonth()     : now.getMonth();
+  let y2 = past ? now.getFullYear()   : date.getFullYear();
+  let m2 = past ? now.getMonth()      : date.getMonth();
+
+  // Compute raw differences
+  let years  = y2 - y1;
+  let months = m2 - m1;
+
+  // Normalize negative months
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  // Formatting
+  const yStr = `${years} year${years === 1 ? '' : 's'}`;
+  const mStr = `${months} month${months === 1 ? '' : 's'}`;
+
+  // Zero case
+  if (years === 0 && months === 0) {
+    return past ? 'this month' : 'later this month';
+  }
+
+  return past
+    ? `${yStr} and ${mStr} ago`
+    : `in ${yStr} and ${mStr}`;
+}
+
+
+  // helper: local time with comma after weekday
+  function formatLocalWithComma(date) {
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    const dName = days[date.getDay()];
+    const mName = months[date.getMonth()];
+    const day = date.getDate();
+    const y = date.getFullYear();
+
+    const hh = String(date.getHours()).padStart(2,'0');
+    const mm = String(date.getMinutes()).padStart(2,'0');
+    const ss = String(date.getSeconds()).padStart(2,'0');
+
+    // Grab the GMT offset + time zone name from toString()
+    const tzPartMatch = date.toString().match(/GMT[+-]\d{4} \([^)]*\)/);
+    const tzPart = tzPartMatch ? tzPartMatch[0] : '';
+
+    return `${dName}, ${mName} ${day} ${y} ${hh}:${mm}:${ss} ${tzPart}`;
+  }
+
+  // helper: compute [startMs, endMs] and a label from the raw input pattern
+    // Compute an inclusive millisecond range for the input's granularity.
+  function computeTimeRangeFromGran(date, gran) {
+    const ms = date.getTime();
+    let start = ms;
+    let end = ms;
+    let label = 'millisecond-level (exact timestamp)';
+
+    if (gran === 'ms') {
+      label = 'millisecond-level (ISO 8601 with ms)';
+      start = ms;
+      end = ms;
+    } else if (gran === 's') {
+      label = 'second-level (whole second)';
+      start = ms;
+      end = ms + 1000 - 1;
+    } else if (gran === 'min') {
+      label = 'minute-level (whole minute)';
+      const d = new Date(ms);
+      d.setUTCSeconds(0, 0);
+      start = d.getTime();
+      end = start + 60 * 1000 - 1;
+    } else if (gran === 'h') {
+      label = 'hour-level (whole hour)';
+      const d = new Date(ms);
+      d.setUTCMinutes(0, 0, 0);
+      start = d.getTime();
+      end = start + 60 * 60 * 1000 - 1;
+    } else if (gran === 'date') {
+      label = 'date-level (whole day)';
+      const d = new Date(ms);
+      d.setUTCHours(0, 0, 0, 0);
+      start = d.getTime();
+      end = start + 24 * 60 * 60 * 1000 - 1;
+    }
+    return { startMs: start, endMs: end, label };
+  }
+
+
+
+  // helper: compute decimal prefix and suffix range for an ID interval
+  function computeIdPrefixRange(minId, maxId) {
+    let minStr = minId.toString();
+    let maxStr = maxId.toString();
+    const len = Math.max(minStr.length, maxStr.length);
+
+    // Zero-pad to same length for comparison
+    minStr = minStr.padStart(len, '0');
+    maxStr = maxStr.padStart(len, '0');
+
+    let i = 0;
+    while (i < len && minStr[i] === maxStr[i]) {
+      i++;
+    }
+
+    const prefix = minStr.slice(0, i).replace(/^0+/, '') || '0';
+    const minSuffix = minStr.slice(i) || '';
+    const maxSuffix = maxStr.slice(i) || '';
+
+    return {
+      prefix,
+      minSuffix,
+      maxSuffix,
+      totalLength: len
+    };
+  }
+
+  if (!input) {
+    resultBox.innerHTML =
+      'Input a valid time format. Try one of:<br>' +
+      '• <a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a> (e.g., 2025-11-11T18:36:00.678Z)<br>' +
+      '• <a href="https://www.rfc-editor.org/rfc/rfc1123" target="_blank">RFC 1123</a> (e.g., Tue, 11 Nov 2025 18:36:00 GMT)<br>' +
+      '• Local with offset (e.g., Tue, 11 Nov 2025 13:36:00 GMT-0500 (Eastern Standard Time))<br>' +
+      '• Slash forms (e.g., 2025/11/11 18:36:00)<br>' +
+      '• IA Wayback (UTC) (e.g., 20251111183600)<br>';
+
+    if (!isPopulatingFromHash) {
+      history.pushState('', document.title, window.location.pathname);
+    }
+    return;
+  }
+
+  const parsed = parseToDateAndGranularity(input);
+  if (!parsed) {
+    resultBox.innerHTML =
+      'Input a valid time format. Try one of:<br>' +
+      '• <a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a> (e.g., 2025-11-11T18:36:00.678Z)<br>' +
+      '• <a href="https://www.rfc-editor.org/rfc/rfc1123" target="_blank">RFC 1123</a> (e.g., Tue, 11 Nov 2025 18:36:00 GMT)<br>' +
+      '• Local with offset (e.g., Tue, 11 Nov 2025 13:36:00 GMT-0500 (Eastern Standard Time))<br>' +
+      '• Slash forms (e.g., 2025/11/11 18:36:00)<br>' +
+      '• IA Wayback (UTC) (e.g., 20251111183600)<br>';
+    return;
+  }
+  const date = parsed.date;
+  const gran = parsed.gran;
+  
+
+  // Determine time window based on granularity
+  const { startMs, endMs, label: granularityLabel } =
+    computeTimeRangeFromGran(date, gran);
+
+  let startBig = BigInt(startMs);
+  let endBig   = BigInt(endMs);
+
+  // If the entire window is before the Snowflake epoch, bail out
+  if (endBig <= TWITTER_EPOCH_MS) {
+    resultBox.innerHTML =
+      'Timestamp range predates Twitter Snowflake epoch (Nov 2010).';
+    return;
+  }
+
+  // Clamp start at epoch if window straddles it
+  if (startBig <= TWITTER_EPOCH_MS) {
+    startBig = TWITTER_EPOCH_MS + 1n;
+  }
+
+  // Compute min/max tweet IDs for that window
+  const minTweetId = (startBig - TWITTER_EPOCH_MS) << 22n;
+  const maxTweetId = ((endBig - TWITTER_EPOCH_MS) << 22n) | LOWER_22_MASK;
+  const expRange = computeIdPrefixExponentRange(minTweetId, maxTweetId);
+
+
+  // Compute prefix + suffix range
+  const { prefix, minSuffix, maxSuffix, totalLength } =
+    computeIdPrefixRange(minTweetId, maxTweetId);
+
+  const wb = waybackTime(date);
+
+  if (!isPopulatingFromHash) {
+    location.hash = `#${wb}`;
+  }
+
+  const rawInputTimestamp = input;
+  const iso      = date.toISOString();          // ISO 8601 (UTC)
+  const rfc1123  = date.toUTCString();          // RFC 1123 (UTC)
+  const localStr = formatLocalWithComma(date);  // Local time, with comma after weekday
+  const relative = formatRelativeYearsMonths(date);
+
+  const labelWidth = 24; // widened a bit to keep things aligned
+  const lines = [
+  padLabel('<b>User Input:            </b>', labelWidth) + rawInputTimestamp,
+
+  //padLabel('<b>Granularity:           </b>', labelWidth) + granularityLabel,
+
+  // New exponent-style output
+  padLabel('<b>Tweet ID prefix:       </b>', labelWidth) +
+    `${expRange.prefixStr || '0'} (of ${expRange.totalDigits}-digit ID)`,
+
+  padLabel('<b>Tweet ID regex:        </b>', labelWidth) +
+    `${expRange.prefixStr || '0'}[0-9]{${expRange.suffixLen}}`,
+
+  padLabel('<b>Tweet ID range:        </b>', labelWidth) +
+    `[${expRange.approxLower.toString()} – ${expRange.approxUpper.toString()}]`,
+
+  padLabel('<b><a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a>:              </b>', labelWidth) +
+    iso,
+  padLabel('<b><a href="https://www.rfc-editor.org/rfc/rfc1123" target="_blank">RFC 1123</a>:              </b>', labelWidth) +
+    rfc1123,
+  padLabel('<b>In your timezone:      </b>', labelWidth) +
+    localStr,
+  padLabel('<b>IA Wayback (UTC):      </b>', labelWidth) +
+    waybackTime(date),
+  padLabel('<b>Tweeted:               </b>', labelWidth) +
+    relative,
+  ];
+
+
+  resultBox.innerHTML = lines.join('<br>');
+}
+
+
+document.querySelector('#input1').oninput = showTweetTime;
+
+document.querySelector('#input2').oninput = get_tweet_id_from_timestamp;
+
+window.addEventListener('load', () => {
+            history.replaceState('', document.title, window.location.pathname);
+
+            const input1 = document.querySelector('#input1');
+            const input2 = document.querySelector('#input2');
+            if (input1) input1.value = '';
+            if (input2) input2.value = '';
+
+            const result1 = document.querySelector('#result1');
+            const result2 = document.querySelector('#result2');
+
+            if (result1) {
+                result1.innerHTML = 'Input a valid tweet ID or URL';
+            }
+            if (result2) {
+                result2.innerHTML =
+                          'Input a valid time format. Try one of:<br>' +
+                          '• <a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a> (e.g., 2025-11-11T18:36:00.678Z)<br>' +
+                          '• <a href="https://www.rfc-editor.org/rfc/rfc1123" target="_blank">RFC 1123</a> (e.g., Tue, 11 Nov 2025 18:36:00 GMT)<br>' +
+                          '• Local with offset (e.g., Tue, 11 Nov 2025 13:36:00 GMT-0500 (Eastern Standard Time))<br>' +
+                          '• Slash forms (e.g., 2025/11/11 18:36:00)<br>' +
+                          '• IA Wayback (UTC) (e.g., 20251111183600)<br>';
+            }
+});
+
     </script>
 </body>
 </html>
