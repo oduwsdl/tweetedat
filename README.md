@@ -6,7 +6,7 @@
 
 [1] Mohammed Nauman Siddique and Sawood Alam. 2019. TweetedAt: Finding Tweet Timestamps for Pre and Post Snowflake Tweet IDs. (August 2019). Retrieved July 25, 2020 from https://ws-dl.blogspot.com/2019/08/2019-08-03-tweetedat-finding-tweet.html
 
-[2] Tarannum Zaki, Michael L. Nelson, and Michele C. Weigle. 2026. Reverse TweetedAt: Determining Tweet ID prefixes from Timestamps. (March 2026).
+[2] Tarannum Zaki, Michael L. Nelson, and Michele C. Weigle. 2026. Reverse TweetedAt: Determining Tweet ID prefixes from Timestamps. (March 2026). Retrieved March 18, 2026 from https://ws-dl.blogspot.com/2026/03/2026-03-18-reverse-tweetedat.html
 
 ## Why not check on Twitter directly?
 
